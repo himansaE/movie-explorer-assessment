@@ -38,7 +38,7 @@ pnpm build
 
 ## Deployment
 
-`vercel.json` configures a static Vercel deployment with SPA route rewrites. Import the project on Vercel or run `vercel` from this directory. Set `REACT_APP_TMDB_API_TOKEN`, `REACT_APP_DEMO_USERNAME`, and `REACT_APP_DEMO_PASSWORD` as build environment variables. Build with `pnpm build` and publish the `build` directory. Updating a `REACT_APP_` value requires a new build and deployment. Test direct navigation to `/movie/:id` and `/favorites` after deployment. The app cannot show live films until a valid TMDb token is configured.
+`netlify.toml` configures the Netlify build (`pnpm build`), the `build` publish directory, and a SPA rewrite so direct navigation to `/movie/:id` and `/favorites` works. Connect the GitHub repository to Netlify or deploy the production `build` directory with Netlify CLI. Set `REACT_APP_TMDB_API_TOKEN`, `REACT_APP_DEMO_USERNAME`, and `REACT_APP_DEMO_PASSWORD` as build environment variables for a Git-connected build. The token must be disposable because these values are embedded in the public browser bundle. Updating a `REACT_APP_` value requires a new build and deployment. Test direct navigation after deployment; live films require a valid TMDb token.
 
 ## Data attribution
 
