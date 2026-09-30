@@ -5,7 +5,7 @@ import FavoriteBorderRoundedIcon from '@mui/icons-material/FavoriteBorderRounded
 import MovieFilterRoundedIcon from '@mui/icons-material/MovieFilterRounded';
 import StarRoundedIcon from '@mui/icons-material/StarRounded';
 import { motion, useReducedMotion } from 'motion/react';
-import { Link } from 'react-router';
+import { Link, useLocation } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { fetchMovieDetails, imageUrl } from './api';
 import type { BrowseCategory } from './api';
@@ -25,11 +25,12 @@ function releaseLabel(movie: Movie, context?: BrowseCategory): string {
 export function MovieCard({ movie, context }: { movie: Movie; context?: BrowseCategory }) {
   const { isFavorite, toggleFavorite } = useFavorites();
   const queryClient = useQueryClient();
+  const location = useLocation();
   const reducedMotion = useReducedMotion();
   const saved = isFavorite(movie.id);
   const prefetch = () => { void queryClient.prefetchQuery({ queryKey: ['movie', movie.id], queryFn: ({ signal }) => fetchMovieDetails(movie.id, signal), staleTime: 5 * 60 * 1000 }); };
   return <motion.article layout={!reducedMotion} className="movie-card" whileHover={reducedMotion ? undefined : { y: -5 }} transition={{ duration: 0.22 }} onMouseEnter={prefetch} onFocus={prefetch}>
-    <Link className="movie-card-link" to={`/movie/${movie.id}`} aria-label={`View ${movie.title} details`}>
+    <Link className="movie-card-link" to={`/movie/${movie.id}`} state={{ from: location.pathname + location.search, preview: movie }} aria-label={`View ${movie.title} details`}>
       <div className="poster-wrap">
         {imageUrl(movie.poster_path, 'w342') ? <img src={imageUrl(movie.poster_path, 'w342')} alt={`${movie.title} poster`} loading="lazy" /> : <div className="poster-fallback"><MovieFilterRoundedIcon fontSize="large" /><span>Poster unavailable</span></div>}
         <span className="poster-shade" />

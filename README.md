@@ -18,7 +18,8 @@ The demo credentials are **username `demo` / password `MovieExplorer2026!`**. A 
 - Purposeful collections for films in theaters, trending this week, upcoming releases, and top-rated films. The selected collection is in the URL as `?view=`. Upcoming releases are filtered to dates from today onward.
 - Debounced title search in the URL as `?q=`, browser Back/Forward support, and infinite scrolling with a manual Load more fallback.
 - Movie details with overview, rating, genres, cast, and trailer link. Favorites and the last search persist in localStorage after refresh; favorites belong to this browser.
-- Loading skeletons, empty and error states, dark/light theme, responsive mobile navigation, reduced-motion support, and restrained Motion transitions.
+- Content-shaped skeletons for the featured area, movie grid, poster, details, and cast; empty and error states; dark/light theme; responsive mobile navigation; and reduced-motion support.
+- Layered movie page transitions that start at the top, with the previous Explore scroll position restored when returning.
 - Direct TMDb requests through Axios. There is no custom Node API, database, or Supabase service.
 
 ## Demo security risk

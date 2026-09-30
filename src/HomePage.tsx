@@ -68,7 +68,7 @@ export function HomePage() {
         <div className="hero-top-row"><div className="hero-intro"><span className="hero-marker">Movie Explorer</span><h1>{hasQuery ? 'Find a film worth your time.' : 'Your next movie night starts here.'}</h1></div>
           <div className="search-area"><label htmlFor="movie-search">Search movies</label><TextField id="movie-search" placeholder="Search by title" value={query} onChange={(event) => { const value = event.target.value.slice(0, 100); if (!value.trim()) writeLastSearch(''); void setQuery(value); }} fullWidth autoComplete="off" InputProps={{ startAdornment: <InputAdornment position="start"><SearchRoundedIcon /></InputAdornment>, endAdornment: query ? <InputAdornment position="end"><IconButton onClick={() => { writeLastSearch(''); void setQuery(''); }} aria-label="Clear search" size="small"><CloseRoundedIcon /></IconButton></InputAdornment> : undefined }} /></div>
         </div>
-        {!hasQuery && <FeaturedCarousel movies={featuredMovies} activeIndex={selectedIndex} onSelect={setFeaturedIndex} collectionLabel={collection.label} />}
+        {!hasQuery && (moviesQuery.isPending ? <div className="featured-glass featured-loading" aria-label="Loading featured movies"><div className="featured-label"><span>{collection.label}</span></div><div className="featured-loading-title" /><div className="featured-loading-meta" /><div className="featured-loading-line" /><div className="featured-loading-line short" /><div className="featured-loading-button" /></div> : <FeaturedCarousel movies={featuredMovies} activeIndex={selectedIndex} onSelect={setFeaturedIndex} collectionLabel={collection.label} />)}
       </div>
     </motion.section>
     <section className="results-section container" aria-live="polite">
