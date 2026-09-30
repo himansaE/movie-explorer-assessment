@@ -4,7 +4,7 @@ import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded';
 import StarRoundedIcon from '@mui/icons-material/StarRounded';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
-import { Link, useLocation } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import type { Movie } from './types';
 
 interface FeaturedCarouselProps {
@@ -16,7 +16,7 @@ interface FeaturedCarouselProps {
 
 export function FeaturedCarousel({ movies, activeIndex, onSelect, collectionLabel }: FeaturedCarouselProps) {
   const reducedMotion = useReducedMotion();
-  const location = useLocation();
+  const navigate = useNavigate();
   const movie = movies[activeIndex] || movies[0];
   if (!movie) {
     return <div className="featured-placeholder"><h2>A good film changes the evening.</h2><p>Choose a collection below or search for a movie you already have in mind.</p></div>;
@@ -31,7 +31,7 @@ export function FeaturedCarousel({ movies, activeIndex, onSelect, collectionLabe
         <h2>{movie.title}</h2>
         <div className="featured-meta">{year && <span>{year}</span>}{score && <span><StarRoundedIcon aria-hidden="true" /> {score} on TMDb</span>}</div>
         <p>{movie.overview || 'Explore the cast, details, and trailer for this film.'}</p>
-        <Button component={Link} to={`/movie/${movie.id}`} state={{ from: location.pathname + location.search, preview: movie }} variant="contained" endIcon={<ArrowForwardRoundedIcon />}>View movie details</Button>
+        <Button component={Link} to={`/movie/${movie.id}`} state={{ preview: movie }} onClick={(event) => { if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return; event.preventDefault(); navigate(`/movie/${movie.id}`, { state: { from: window.location.pathname + window.location.search, preview: movie } }); }} variant="contained" endIcon={<ArrowForwardRoundedIcon />}>View movie details</Button>
       </motion.div>
     </AnimatePresence>
     {movies.length > 1 && <div className="featured-controls">

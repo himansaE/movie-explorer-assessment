@@ -5,6 +5,7 @@ import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { parseAsString, useQueryState } from 'nuqs';
+import { useLocation } from 'react-router';
 import { fetchMoviePage, getErrorMessage, imageUrl } from './api';
 import type { BrowseCategory } from './api';
 import { FeaturedCarousel } from './FeaturedCarousel';
@@ -23,6 +24,8 @@ function isBrowseCategory(value: string): value is BrowseCategory {
 }
 
 export function HomePage() {
+  const location = useLocation();
+  const skipSavedSearch = Boolean((location.state as { skipSavedSearch?: boolean } | null)?.skipSavedSearch);
   const [query, setQuery] = useQueryState('q', parseAsString.withDefault('').withOptions({ history: 'replace', clearOnDefault: true }));
   const [view, setView] = useQueryState('view', parseAsString.withDefault('now_playing').withOptions({ history: 'push', clearOnDefault: true }));
   const category: BrowseCategory = isBrowseCategory(view) ? view : 'now_playing';
@@ -33,7 +36,7 @@ export function HomePage() {
   const sentinel = useRef<HTMLDivElement>(null);
   const reducedMotion = useReducedMotion();
 
-  useEffect(() => { if (!new URLSearchParams(window.location.search).has('q')) { const saved = readLastSearch(); if (saved) void setQuery(saved); } }, []); // URL takes precedence over local history.
+  useEffect(() => { if (!skipSavedSearch && !new URLSearchParams(window.location.search).has('q')) { const saved = readLastSearch(); if (saved) void setQuery(saved); } }, []); // URL takes precedence over local history.
   useEffect(() => { if (debouncedQuery) writeLastSearch(debouncedQuery); }, [debouncedQuery]);
   useEffect(() => { setFeaturedIndex(0); }, [category]);
 

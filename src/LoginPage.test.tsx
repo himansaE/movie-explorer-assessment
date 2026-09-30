@@ -4,13 +4,14 @@ import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { MemoryRouter } from 'react-router';
 import { AuthProvider } from './auth';
+import { FavoritesProvider } from './favorites';
 import { LoginPage } from './LoginPage';
 
-beforeEach(() => sessionStorage.clear());
+beforeEach(() => { sessionStorage.clear(); localStorage.clear(); });
 
 test('sign in blocks every credential control and shows a spinner during demo validation', async () => {
   const user = userEvent.setup();
-  render(<MemoryRouter><AuthProvider><LoginPage /></AuthProvider></MemoryRouter>);
+  render(<MemoryRouter><AuthProvider><FavoritesProvider><LoginPage /></FavoritesProvider></AuthProvider></MemoryRouter>);
   const username = await screen.findByRole('textbox', { name: /username/i });
   const password = screen.getByLabelText(/^Password/);
   await user.type(username, 'demo');
@@ -26,7 +27,7 @@ test('sign in blocks every credential control and shows a spinner during demo va
 
 test('wrong demo password unlocks the form with an inline error', async () => {
   const user = userEvent.setup();
-  render(<MemoryRouter><AuthProvider><LoginPage /></AuthProvider></MemoryRouter>);
+  render(<MemoryRouter><AuthProvider><FavoritesProvider><LoginPage /></FavoritesProvider></AuthProvider></MemoryRouter>);
   const username = await screen.findByRole('textbox', { name: /username/i });
   const password = screen.getByLabelText(/^Password/);
   await user.type(username, 'demo');

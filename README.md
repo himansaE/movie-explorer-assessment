@@ -9,17 +9,17 @@ A mobile-first movie discovery assessment built with Create React App, TypeScrip
 3. Copy `.env.example` to `.env`. Add a **disposable** TMDb API Read Access Token as `REACT_APP_TMDB_API_TOKEN`. The demo credentials are included in the example.
 4. Run `pnpm dev` and open the local address shown in the terminal (normally `http://localhost:3000`). Restart the development server after changing `.env`.
 
-The demo credentials are **username `demo` / password `MovieExplorer2026!`**. A missing or invalid TMDb token produces an error with a retry option; live movie data requires a valid token.
+Browsing and movie details do not need an account. Saving or opening Favorites asks for the demo login: **username `demo` / password `MovieExplorer2026!`**. A missing or invalid TMDb token produces an error with a retry option; live movie data requires a valid token.
 
 ## What is included
 
-- Demo-only login with a tab-scoped session, protected routes, logout, and a locked form with a spinner during sign-in.
+- Public movie browsing and details. Demo-only login gates Favorites and saving a movie; the locked form shows a spinner during sign-in, then returns to the requested action.
 - A cinematic five-film carousel with backdrop images, concise details, previous/next controls, and direct links to movie details.
 - Purposeful collections for films in theaters, trending this week, upcoming releases, and top-rated films. The selected collection is in the URL as `?view=`. Upcoming releases are filtered to dates from today onward.
 - Debounced title search in the URL as `?q=`, browser Back/Forward support, and infinite scrolling with a manual Load more fallback.
 - Movie details with overview, rating, genres, cast, and trailer link. Favorites and the last search persist in localStorage after refresh; favorites belong to this browser.
 - Content-shaped skeletons for the featured area, movie grid, poster, details, and cast; empty and error states; dark/light theme; responsive mobile navigation; and reduced-motion support.
-- Layered movie page transitions that start at the top, with the previous Explore scroll position restored when returning.
+- Layered movie page transitions that start at the top. Back to explore keeps the selected collection while clearing an old title search from the URL; last search remains in localStorage.
 - Direct TMDb requests through Axios. There is no custom Node API, database, or Supabase service.
 
 ## Demo security risk

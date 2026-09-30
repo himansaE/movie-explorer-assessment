@@ -7,10 +7,14 @@ import { motion, useReducedMotion } from 'motion/react';
 import { Navigate, useLocation, useNavigate } from 'react-router';
 import { getErrorMessage, useAuth } from './auth';
 import { getDemoConfig } from './demoAuth';
+import { useFavorites } from './favorites';
+import { safeAppPath } from './navigation';
+import type { LoginRequestState } from './navigation';
 
 export function LoginPage() {
   const { username: currentUser, checking, signIn } = useAuth();
   const demoConfig = getDemoConfig();
+  const { isFavorite, toggleFavorite } = useFavorites();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [visible, setVisible] = useState(false);
@@ -19,9 +23,10 @@ export function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const reducedMotion = useReducedMotion();
-  const returnTo = (location.state as { from?: string } | null)?.from || '/';
+  const request = location.state as LoginRequestState | null;
+  const returnTo = safeAppPath(request?.from);
   if (checking) return <div className="page-loader"><CircularProgress aria-label="Checking session" /></div>;
-  if (currentUser && phase === 'idle') return <Navigate to="/" replace />;
+  if (currentUser && phase === 'idle') return <Navigate to={returnTo} replace state={request?.returnState} />;
   const busy = phase !== 'idle';
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -30,8 +35,9 @@ export function LoginPage() {
     setError(''); setPhase('submitting');
     try {
       await signIn(username, password);
+      if (request?.pendingFavorite && !isFavorite(request.pendingFavorite.id)) toggleFavorite(request.pendingFavorite);
       setPhase('success');
-      window.setTimeout(() => navigate(returnTo, { replace: true }), reducedMotion ? 0 : 220);
+      window.setTimeout(() => navigate(returnTo, { replace: true, state: request?.returnState }), reducedMotion ? 0 : 220);
     } catch (cause) { setError(getErrorMessage(cause)); setPhase('idle'); }
   }
   return <main className="login-page">
@@ -45,7 +51,7 @@ export function LoginPage() {
       <div className="mobile-brand"><MovieFilterRoundedIcon /> MOVIE EXPLORER</div>
       <span className="login-kicker">Your cinema, curated</span>
       <h2 id="login-title">Welcome back</h2>
-      <p className="login-intro">Sign in to explore films and keep your favorites close.</p>
+      <p className="login-intro">Browse movies freely. Sign in when you want to save favorites.</p>
       <form onSubmit={submit} aria-busy={busy}>
         <div className="login-fields">
           <TextField label="Username" name="username" autoComplete="username" value={username} onChange={(event) => setUsername(event.target.value)} disabled={busy} fullWidth required inputProps={{ maxLength: 64 }} />
