@@ -1,31 +1,32 @@
 # Movie Explorer
 
-A mobile-first movie discovery assessment built with Create React App, TypeScript, React Router v7, MUI, Motion for React, TanStack Query, nuqs, Axios, and TMDb. Reviewers can search and explore films, open details, and save favorites.
+A mobile-first movie discovery assessment built with Create React App, TypeScript, React Router v7, MUI, Motion for React, TanStack Query, nuqs, Axios, and TMDb.
 
 ## Run locally
 
 1. Install Node.js 20+ and pnpm 10+.
 2. Run `pnpm install`.
-3. Copy `.env.example` to `.env`. Add a **disposable** TMDb API Read Access Token as `REACT_APP_TMDB_API_TOKEN`. The demo username and password are already shown in the example.
-4. Run `pnpm dev` and open `http://localhost:3000`.
+3. Copy `.env.example` to `.env`. Add a **disposable** TMDb API Read Access Token as `REACT_APP_TMDB_API_TOKEN`. The demo credentials are included in the example.
+4. Run `pnpm dev` and open the local address shown in the terminal (normally `http://localhost:3000`). Restart the development server after changing `.env`.
 
-The demo credentials are **username `demo` / password `MovieExplorer2026!`**. They are intentionally public and shown on the login screen. Restart the development server after changing `.env`. An older `TMDB_API_TOKEN` setting is ignored by this client-only version. If the token is missing or invalid, the app shows an error with a retry option; live films require a valid token.
+The demo credentials are **username `demo` / password `MovieExplorer2026!`**. A missing or invalid TMDb token produces an error with a retry option; live movie data requires a valid token.
 
 ## What is included
 
-- Demo-only browser login, tab-scoped session, protected navigation, logout, and a disabled form with spinner during sign-in.
-- Trending movies, debounced URL search (`?q=`), browser Back/Forward compatibility, and infinite scrolling with a manual Load more fallback.
-- Details with overview, rating, genres, cast and trailer link; favorites and last search persist in localStorage after refresh.
-- Loading skeletons, empty and error states, dark/light theme, responsive mobile navigation, reduced-motion support, and Motion transitions.
-- Direct TMDb requests from the React app through Axios. There is no custom Node API, database, or Supabase service.
-
-Favorites are specific to each browser and are not synced across devices.
+- Demo-only login with a tab-scoped session, protected routes, logout, and a locked form with a spinner during sign-in.
+- A cinematic five-film carousel with backdrop images, concise details, previous/next controls, and direct links to movie details.
+- Purposeful collections for films in theaters, trending this week, upcoming releases, and top-rated films. The selected collection is in the URL as `?view=`. Upcoming releases are filtered to dates from today onward.
+- Debounced title search in the URL as `?q=`, browser Back/Forward support, and infinite scrolling with a manual Load more fallback.
+- Movie details with overview, rating, genres, cast, and trailer link. Favorites and the last search persist in localStorage after refresh; favorites belong to this browser.
+- Content-shaped skeletons for the featured area, movie grid, poster, details, and cast; empty and error states; dark/light theme; responsive mobile navigation; and reduced-motion support.
+- Layered movie page transitions that start at the top, with the previous Explore scroll position restored when returning.
+- Direct TMDb requests through Axios. There is no custom Node API, database, or Supabase service.
 
 ## Demo security risk
 
-**The login is a visual demo, not security.** The username and password are included in the browser build and can be read or bypassed by anyone. The session is stored in `sessionStorage`. Do not use this login to protect private data or real accounts.
+**The login is a visual demo, not security.** The username and password are embedded in the browser build and can be read or bypassed by anyone. The session uses `sessionStorage`. Do not use this login to protect private data or real accounts.
 
-**The TMDb token is public in this client-only version.** Create React App embeds every `REACT_APP_` value into the browser build, and each TMDb request sends the token from the browser. Anyone can inspect and reuse it, which can consume its quota or lead to revocation. Use a disposable token for this short-lived assessment, monitor its usage, and revoke it afterward. Do not put a private or production token in `REACT_APP_TMDB_API_TOKEN`. The project owner explicitly approved this tradeoff for the demo.
+**The TMDb token is public in this client-only version.** Create React App embeds `REACT_APP_` values in the browser build, and the browser sends this token with each TMDb request. Anyone can inspect and reuse it, which could consume its quota or lead to revocation. Use only a disposable token for this short-lived assessment, monitor usage, and revoke it afterward. Do not put a private or production token in `REACT_APP_TMDB_API_TOKEN`. The project owner explicitly approved this demo tradeoff.
 
 ## Test and build
 
@@ -37,7 +38,7 @@ pnpm build
 
 ## Deployment
 
-The repository includes `vercel.json` for static deployment. Import the project on Vercel or run `vercel` from this directory. Set `REACT_APP_TMDB_API_TOKEN`, `REACT_APP_DEMO_USERNAME`, and `REACT_APP_DEMO_PASSWORD` as build environment variables. Build with `pnpm build` and publish the `build` directory. Test direct navigation to `/movie/:id` and `/favorites` after deployment. Updating any `REACT_APP_` value requires a new build and deployment.
+`netlify.toml` configures the Netlify build (`pnpm build`), the `build` publish directory, and a SPA rewrite so direct navigation to `/movie/:id` and `/favorites` works. Connect the GitHub repository to Netlify or deploy the production `build` directory with Netlify CLI. Set `REACT_APP_TMDB_API_TOKEN`, `REACT_APP_DEMO_USERNAME`, and `REACT_APP_DEMO_PASSWORD` as build environment variables for a Git-connected build. The token must be disposable because these values are embedded in the public browser bundle. Updating a `REACT_APP_` value requires a new build and deployment. Test direct navigation after deployment; live films require a valid TMDb token.
 
 ## Data attribution
 

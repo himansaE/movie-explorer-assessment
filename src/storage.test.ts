@@ -5,6 +5,8 @@ beforeEach(() => localStorage.clear());
 test('last search survives reload and trims whitespace', () => {
   writeLastSearch('  Dune  ');
   expect(readLastSearch()).toBe('Dune');
+  writeLastSearch('');
+  expect(readLastSearch()).toBe('');
 });
 
 test('favorites survive reload and discard malformed entries', () => {
