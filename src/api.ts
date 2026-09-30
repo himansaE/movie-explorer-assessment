@@ -1,29 +1,51 @@
 import axios from 'axios';
 import type { Credits, MovieDetails, MoviePage, Videos } from './types';
 
-export const http = axios.create({ baseURL: '/api', withCredentials: true, timeout: 10000 });
+const token = process.env.REACT_APP_TMDB_API_TOKEN?.trim();
+const http = axios.create({
+  baseURL: 'https://api.themoviedb.org/3',
+  timeout: 10000,
+  headers: token ? { Authorization: `Bearer ${token}`, Accept: 'application/json' } : undefined,
+});
+
+function requireToken(): void {
+  if (!token || token.startsWith('replace-')) {
+    throw new Error('Add a disposable TMDb token to REACT_APP_TMDB_API_TOKEN in .env, then restart the app.');
+  }
+}
 
 export function getErrorMessage(error: unknown): string {
   if (axios.isAxiosError(error)) {
     if (!error.response) return 'Connection failed. Check your network and retry.';
-    return typeof error.response.data?.error === 'string' ? error.response.data.error : 'Request failed. Please retry.';
+    if (error.response.status === 401) return 'TMDb rejected the demo token. Check REACT_APP_TMDB_API_TOKEN.';
+    if (error.response.status === 429) return 'TMDb rate limit reached. Please try again later.';
+    return 'The movie service is unavailable. Please retry.';
   }
-  return 'Something went wrong. Please retry.';
+  return error instanceof Error ? error.message : 'Something went wrong. Please retry.';
 }
+
 export async function fetchMoviePage(kind: 'trending' | 'search', page: number, query: string, signal?: AbortSignal): Promise<MoviePage> {
-  const { data } = await http.get<MoviePage>('/tmdb', { params: { kind, page, ...(kind === 'search' ? { query } : {}) }, signal });
+  requireToken();
+  const path = kind === 'search' ? '/search/movie' : '/trending/movie/day';
+  const params = kind === 'search'
+    ? { query, page, include_adult: false, language: 'en-US' }
+    : { page, language: 'en-US' };
+  const { data } = await http.get<MoviePage>(path, { params, signal });
   return data;
 }
 export async function fetchMovieDetails(id: number, signal?: AbortSignal): Promise<MovieDetails> {
-  const { data } = await http.get<MovieDetails>('/tmdb', { params: { kind: 'details', id }, signal });
+  requireToken();
+  const { data } = await http.get<MovieDetails>(`/movie/${id}`, { params: { language: 'en-US' }, signal });
   return data;
 }
 export async function fetchCredits(id: number, signal?: AbortSignal): Promise<Credits> {
-  const { data } = await http.get<Credits>('/tmdb', { params: { kind: 'credits', id }, signal });
+  requireToken();
+  const { data } = await http.get<Credits>(`/movie/${id}/credits`, { params: { language: 'en-US' }, signal });
   return data;
 }
 export async function fetchVideos(id: number, signal?: AbortSignal): Promise<Videos> {
-  const { data } = await http.get<Videos>('/tmdb', { params: { kind: 'videos', id }, signal });
+  requireToken();
+  const { data } = await http.get<Videos>(`/movie/${id}/videos`, { params: { language: 'en-US' }, signal });
   return data;
 }
 export function imageUrl(path: string | null | undefined, size: 'w342' | 'w500' | 'w780' | 'original' = 'w500'): string | undefined {

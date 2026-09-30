@@ -1,5 +1,5 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { http, getErrorMessage } from './api';
+import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import { clearDemoSession, getDemoConfig, readDemoSession, saveDemoSession, validateDemoCredentials } from './demoAuth';
 
 interface AuthValue {
   username: string | null;
@@ -10,21 +10,19 @@ interface AuthValue {
 const AuthContext = createContext<AuthValue | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [username, setUsername] = useState<string | null>(null);
-  const [checking, setChecking] = useState(true);
-  useEffect(() => {
-    let active = true;
-    http.get<{ username: string }>('/auth').then(({ data }) => { if (active) setUsername(data.username); }).catch(() => { if (active) setUsername(null); }).finally(() => { if (active) setChecking(false); });
-    return () => { active = false; };
-  }, []);
+  const [username, setUsername] = useState<string | null>(() => readDemoSession());
   const signIn = useCallback(async (name: string, password: string) => {
-    const { data } = await http.post<{ username: string }>('/auth', { username: name, password });
-    setUsername(data.username);
+    await new Promise((resolve) => window.setTimeout(resolve, 450));
+    const config = getDemoConfig();
+    if (!validateDemoCredentials(name, password, config)) throw new Error('Incorrect username or password.');
+    saveDemoSession(config.username);
+    setUsername(config.username);
   }, []);
   const signOut = useCallback(async () => {
-    try { await http.delete('/auth'); } finally { setUsername(null); }
+    clearDemoSession();
+    setUsername(null);
   }, []);
-  const value = useMemo(() => ({ username, checking, signIn, signOut }), [username, checking, signIn, signOut]);
+  const value = useMemo(() => ({ username, checking: false, signIn, signOut }), [username, signIn, signOut]);
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 export function useAuth(): AuthValue {
@@ -32,4 +30,6 @@ export function useAuth(): AuthValue {
   if (!value) throw new Error('AuthProvider missing');
   return value;
 }
-export { getErrorMessage };
+export function getErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : 'Something went wrong. Please retry.';
+}

@@ -5,12 +5,10 @@
   "type": "module",
   "scripts": {
     "start": "react-scripts start",
-    "dev": "concurrently -k \"node server/dev.js\" \"react-scripts start\"",
+    "dev": "react-scripts start",
     "build": "react-scripts build",
     "typecheck": "tsc --noEmit",
-    "test": "react-scripts test --watchAll=false --runInBand --passWithNoTests",
-    "test:server": "node --test server/*.test.js",
-    "serve": "node server/dev.js"
+    "test": "react-scripts test --watchAll=false --runInBand --passWithNoTests"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -19,9 +17,6 @@
     "@mui/material": "^7.3.0",
     "@tanstack/react-query": "^5.90.0",
     "axios": "^1.12.0",
-    "concurrently": "^9.2.1",
-    "dotenv": "^16.6.1",
-    "express": "^4.21.2",
     "motion": "^12.23.0",
     "nuqs": "^2.7.0",
     "react": "18.3.1",
@@ -39,10 +34,17 @@
     "@types/react-dom": "^18.3.0",
     "typescript": "^5.8.0"
   },
-  "proxy": "http://localhost:3001",
   "packageManager": "pnpm@10.12.4",
   "browserslist": {
-    "production": [">0.2%", "not dead", "not op_mini all"],
-    "development": ["last 1 chrome version", "last 1 firefox version", "last 1 safari version"]
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }

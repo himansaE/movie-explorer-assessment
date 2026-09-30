@@ -1,41 +1,44 @@
 # Movie Explorer
 
-A mobile-first movie discovery assessment built with Create React App, TypeScript, React Router v7, MUI, Motion for React, TanStack Query, nuqs, Axios, and TMDb. The reviewer signs in with one pre-provisioned demo account, searches and explores films, opens details, and saves favorites.
+A mobile-first movie discovery assessment built with Create React App, TypeScript, React Router v7, MUI, Motion for React, TanStack Query, nuqs, Axios, and TMDb. Reviewers can search and explore films, open details, and save favorites.
 
 ## Run locally
 
 1. Install Node.js 20+ and pnpm 10+.
 2. Run `pnpm install`.
-3. Copy `.env.example` to `.env`. Set `DEMO_USERNAME`, `DEMO_PASSWORD`, `AUTH_COOKIE_SECRET` (at least 32 random characters), and `TMDB_API_TOKEN` (TMDb API Read Access Token). Never prefix server secrets with `REACT_APP_`.
+3. Copy `.env.example` to `.env`. Add a **disposable** TMDb API Read Access Token as `REACT_APP_TMDB_API_TOKEN`. The demo username and password are already shown in the example.
 4. Run `pnpm dev` and open `http://localhost:3000`.
 
-For this local assessment copy, the pre-provisioned reviewer account is **username `demo` / password `MovieExplorer2026!`** in the ignored `.env`. The published environment must set the same values for those credentials to work there. The password is intentionally shared for review and should never be used for a personal account.
-
-`pnpm serve` serves the optimized `build/` folder and the same API at `http://localhost:3001` after `pnpm build`.
+The demo credentials are **username `demo` / password `MovieExplorer2026!`**. They are intentionally public and shown on the login screen. Restart the development server after changing `.env`. An older `TMDB_API_TOKEN` setting is ignored by this client-only version. If the token is missing or invalid, the app shows an error with a retry option; live films require a valid token.
 
 ## What is included
 
-- Real server-validated username/password login, signed HttpOnly cookie, session restoration, protected routes, logout, disabled login form and spinner during sign-in.
+- Demo-only browser login, tab-scoped session, protected navigation, logout, and a disabled form with spinner during sign-in.
 - Trending movies, debounced URL search (`?q=`), browser Back/Forward compatibility, and infinite scrolling with a manual Load more fallback.
-- Details with overview, rating, genres, cast and trailer link; favorites and last search persist in localStorage even after refresh.
+- Details with overview, rating, genres, cast and trailer link; favorites and last search persist in localStorage after refresh.
 - Loading skeletons, empty and error states, dark/light theme, responsive mobile navigation, reduced-motion support, and Motion transitions.
-- TMDb token held on the server behind a validated `/api/tmdb` proxy. The browser bundle contains no TMDb secret or password.
+- Direct TMDb requests from the React app through Axios. There is no custom Node API, database, or Supabase service.
 
-Supabase was removed per the latest project direction. The app uses a server-side demo account and browser localStorage, so favorites are specific to each browser rather than synced across devices.
+Favorites are specific to each browser and are not synced across devices.
+
+## Demo security risk
+
+**The login is a visual demo, not security.** The username and password are included in the browser build and can be read or bypassed by anyone. The session is stored in `sessionStorage`. Do not use this login to protect private data or real accounts.
+
+**The TMDb token is public in this client-only version.** Create React App embeds every `REACT_APP_` value into the browser build, and each TMDb request sends the token from the browser. Anyone can inspect and reuse it, which can consume its quota or lead to revocation. Use a disposable token for this short-lived assessment, monitor its usage, and revoke it afterward. Do not put a private or production token in `REACT_APP_TMDB_API_TOKEN`. The project owner explicitly approved this tradeoff for the demo.
 
 ## Test and build
 
 ```sh
 pnpm test
-pnpm test:server
 pnpm typecheck
 pnpm build
 ```
 
 ## Deployment
 
-The repository includes `vercel.json` and Vercel Functions in `api/`. Import the project on Vercel or run `vercel` from this directory, then set `DEMO_USERNAME`, `DEMO_PASSWORD`, `AUTH_COOKIE_SECRET`, and `TMDB_API_TOKEN` as server environment variables in every target environment. Use `pnpm build` and output directory `build`. Test direct navigation to `/movie/:id` and `/favorites` after deployment. Deployment cannot show live films until a valid TMDb token is configured.
+The repository includes `vercel.json` for static deployment. Import the project on Vercel or run `vercel` from this directory. Set `REACT_APP_TMDB_API_TOKEN`, `REACT_APP_DEMO_USERNAME`, and `REACT_APP_DEMO_PASSWORD` as build environment variables. Build with `pnpm build` and publish the `build` directory. Test direct navigation to `/movie/:id` and `/favorites` after deployment. Updating any `REACT_APP_` value requires a new build and deployment.
 
-## Data and security
+## Data attribution
 
-TMDb data and images are provided by [The Movie Database](https://www.themoviedb.org/). This project is not endorsed or certified by TMDb. The server only permits known movie endpoints, validates query/page/ID input, checks the signed session, limits upstream request duration, and never returns the token. The demo account is intentionally public for evaluation; use platform rate limits if deploying beyond a short-lived assessment. The browser stores favorites, last search, and theme; it does not store the password or manually manage the session token.
+TMDb data and images are provided by [The Movie Database](https://www.themoviedb.org/). This project is not endorsed or certified by TMDb.

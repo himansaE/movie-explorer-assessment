@@ -6,9 +6,11 @@ import MovieFilterRoundedIcon from '@mui/icons-material/MovieFilterRounded';
 import { motion, useReducedMotion } from 'motion/react';
 import { Navigate, useLocation, useNavigate } from 'react-router';
 import { getErrorMessage, useAuth } from './auth';
+import { getDemoConfig } from './demoAuth';
 
 export function LoginPage() {
   const { username: currentUser, checking, signIn } = useAuth();
+  const demoConfig = getDemoConfig();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [visible, setVisible] = useState(false);
@@ -52,7 +54,7 @@ export function LoginPage() {
         {error && <Alert severity="error" className="login-error">{error}</Alert>}
         <Button type="submit" className="login-submit" variant="contained" fullWidth disabled={busy}>{phase === 'submitting' ? <><CircularProgress size={19} color="inherit" /> Signing in...</> : phase === 'success' ? '✓ Signed in' : 'Sign in'}</Button>
       </form>
-      <div className="demo-hint"><strong>Demo account</strong><span>Use the username and password supplied with this assessment.</span></div>
+      <div className="demo-hint"><strong>Demo account</strong><span>Username: {demoConfig.username} · Password: {demoConfig.password}</span></div>
     </motion.section>
   </main>;
 }
