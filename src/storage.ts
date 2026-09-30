@@ -8,7 +8,7 @@ export function readLastSearch(): string {
   catch { return ''; }
 }
 export function writeLastSearch(value: string): void {
-  try { const term = value.trim().slice(0, 100); if (term) localStorage.setItem(SEARCH_KEY, term); }
+  try { const term = value.trim().slice(0, 100); if (term) localStorage.setItem(SEARCH_KEY, term); else localStorage.removeItem(SEARCH_KEY); }
   catch { /* Storage can be unavailable in private browsing. */ }
 }
 export function readFavorites(): FavoriteMovie[] {

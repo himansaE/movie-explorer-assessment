@@ -8,10 +8,21 @@ import { motion, useReducedMotion } from 'motion/react';
 import { Link } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { fetchMovieDetails, imageUrl } from './api';
+import type { BrowseCategory } from './api';
 import { useFavorites } from './favorites';
 import type { Movie } from './types';
 
-export function MovieCard({ movie }: { movie: Movie }) {
+function releaseLabel(movie: Movie, context?: BrowseCategory): string {
+  if (context === 'upcoming' && movie.release_date) {
+    const date = new Date(`${movie.release_date}T00:00:00Z`);
+    if (!Number.isNaN(date.getTime())) {
+      return `Releases ${new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' }).format(date)}`;
+    }
+  }
+  return movie.release_date?.slice(0, 4) || 'Release date unavailable';
+}
+
+export function MovieCard({ movie, context }: { movie: Movie; context?: BrowseCategory }) {
   const { isFavorite, toggleFavorite } = useFavorites();
   const queryClient = useQueryClient();
   const reducedMotion = useReducedMotion();
@@ -25,7 +36,7 @@ export function MovieCard({ movie }: { movie: Movie }) {
         <span className="movie-rating"><StarRoundedIcon sx={{ fontSize: 16 }} />{movie.vote_average > 0 ? movie.vote_average.toFixed(1) : '—'}</span>
       </div>
       <h3>{movie.title}</h3>
-      <p>{movie.release_date?.slice(0, 4) || 'Release date unavailable'}</p>
+      <p>{releaseLabel(movie, context)}</p>
     </Link>
     <Tooltip title={saved ? 'Remove from favorites' : 'Add to favorites'}>
       <IconButton className={`favorite-button ${saved ? 'is-saved' : ''}`} size="small" onClick={() => toggleFavorite(movie)} aria-label={`${saved ? 'Remove' : 'Add'} ${movie.title} ${saved ? 'from' : 'to'} favorites`}>
@@ -34,8 +45,8 @@ export function MovieCard({ movie }: { movie: Movie }) {
     </Tooltip>
   </motion.article>;
 }
-export function MovieGrid({ movies }: { movies: Movie[] }) {
-  return <div className="movie-grid">{movies.map((movie) => <MovieCard key={movie.id} movie={movie} />)}</div>;
+export function MovieGrid({ movies, context }: { movies: Movie[]; context?: BrowseCategory }) {
+  return <div className="movie-grid">{movies.map((movie) => <MovieCard key={movie.id} movie={movie} context={context} />)}</div>;
 }
 export function MovieSkeletons({ count = 10 }: { count?: number }) {
   return <div className="movie-grid" aria-label="Loading movies">{Array.from({ length: count }, (_, index) => <div className="movie-skeleton" key={index}><Skeleton variant="rounded" className="poster-skeleton" /><Skeleton width="76%" height={28} /><Skeleton width="38%" height={20} /></div>)}</div>;

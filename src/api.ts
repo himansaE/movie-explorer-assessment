@@ -1,6 +1,15 @@
 import axios from 'axios';
 import type { Credits, MovieDetails, MoviePage, Videos } from './types';
 
+export type BrowseCategory = 'now_playing' | 'trending' | 'upcoming' | 'top_rated';
+
+const browsePaths: Record<BrowseCategory, string> = {
+  now_playing: '/movie/now_playing',
+  trending: '/trending/movie/week',
+  upcoming: '/discover/movie',
+  top_rated: '/movie/top_rated',
+};
+
 const token = process.env.REACT_APP_TMDB_API_TOKEN?.trim();
 const http = axios.create({
   baseURL: 'https://api.themoviedb.org/3',
@@ -24,12 +33,16 @@ export function getErrorMessage(error: unknown): string {
   return error instanceof Error ? error.message : 'Something went wrong. Please retry.';
 }
 
-export async function fetchMoviePage(kind: 'trending' | 'search', page: number, query: string, signal?: AbortSignal): Promise<MoviePage> {
+export async function fetchMoviePage(kind: BrowseCategory | 'search', page: number, query: string, signal?: AbortSignal): Promise<MoviePage> {
   requireToken();
-  const path = kind === 'search' ? '/search/movie' : '/trending/movie/day';
+  const path = kind === 'search' ? '/search/movie' : browsePaths[kind];
+  const today = new Date();
+  const localDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
   const params = kind === 'search'
     ? { query, page, include_adult: false, language: 'en-US' }
-    : { page, language: 'en-US' };
+    : kind === 'upcoming'
+      ? { page, language: 'en-US', include_adult: false, include_video: false, sort_by: 'popularity.desc', 'primary_release_date.gte': localDate }
+      : { page, language: 'en-US' };
   const { data } = await http.get<MoviePage>(path, { params, signal });
   return data;
 }
