@@ -80,3 +80,5 @@
 .detail-poster img{opacity:0;transition:opacity .16s cubic-bezier(0.23,1,0.32,1)}
 .detail-poster img.is-loaded{opacity:1}
 .detail-poster img,.detail-poster-skeleton.MuiSkeleton-root{position:absolute;inset:0}
+
+.header-signin.MuiButton-root{color:var(--accent);font-weight:700;white-space:nowrap;padding-inline:12px}
